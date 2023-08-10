@@ -2,9 +2,11 @@ package de.mari
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import org.junit.Test
+import kotlin.js.ExperimentalJsExport
 import kotlin.test.assertEquals
 
 class ApplicationTest {
+    @OptIn(ExperimentalJsExport::class)
     @Test
     fun testRoot() {
         withTestApplication({ module() }) {

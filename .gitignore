@@ -8,8 +8,11 @@
 /client/yarn-error.log*
 /client/pnpm-debug.log*
 
-/client/node_modules/
 /client/dist/
 /build/
 /.idea/
 /.gradle/
+.frontend-gradle-plugin/
+**/node_modules/**
+/client/node/
+/kotlin-js-store

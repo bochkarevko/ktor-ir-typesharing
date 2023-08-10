@@ -1,12 +1,11 @@
 plugins {
-    kotlin("multiplatform") version "1.4.21"
+    kotlin("multiplatform") version "1.9.0"
 }
 
 group = "de.mari"
 version = "0.0.1"
 
 repositories {
-    jcenter()
     mavenCentral()
 }
 
@@ -33,6 +32,6 @@ tasks {
                 rename { name -> name.replace("${rootProject.name}-shared", "index") }
             }
         }
-        finalizedBy(":client:addPackage")
+        finalizedBy(":client:addSharedTypes")
     }
 }

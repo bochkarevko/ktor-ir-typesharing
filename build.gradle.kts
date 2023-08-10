@@ -1,4 +1,5 @@
 val bundle = tasks.register("bundle")
+
 tasks {
     "bundle" {
         dependsOn(":shared:build")

@@ -4,27 +4,26 @@ val logbackVersion: String by project
 
 plugins {
     application
-    kotlin("jvm") version "1.4.21"
+    kotlin("jvm") version "1.9.0"
 }
 
 group = "de.mari"
 version = "0.0.1"
 
 application {
-    @Suppress("DEPRECATION")
-    mainClassName = "io.ktor.server.netty.EngineMain"
+    mainClass.set("io.ktor.server.netty.EngineMain")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=true")
 }
 
 repositories {
+    mavenCentral()
     mavenLocal()
-    jcenter()
     maven { url = uri("https://kotlin.bintray.com/ktor") }
 }
 
 dependencies {
     implementation(project(":shared"))
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.0")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("io.ktor:ktor-server-core:$ktorVersion")
@@ -40,6 +39,10 @@ sourceSets["main"].resources.srcDirs("resources")
 sourceSets["test"].resources.srcDirs("resources")
 
 val fatJar = task("fatJar", type = org.gradle.jvm.tasks.Jar::class) {
+    dependsOn(tasks.get("distZip"))
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
     manifest {
         attributes["Implementation-Title"] = "Ktor - Vue Fat Jar"
         attributes["Implementation-Version"] = project.version
@@ -87,6 +90,8 @@ tasks.processResources {
 //    into("$projectDir/src/types/")
 //}
 
+tasks.get("distTar").dependsOn(fatJar)
+
 tasks {
     "run" {
         dependsOn(setDev)
@@ -96,8 +101,8 @@ tasks {
         dependsOn(":client:build")
         dependsOn(fatJar)
         doLast {
+            delete("$rootDir/build")
             copy {
-                delete("$rootDir/build")
                 from(fatJar)
                 into(file("$rootDir/build"))
             }

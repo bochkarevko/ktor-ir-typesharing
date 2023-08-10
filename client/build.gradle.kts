@@ -1,33 +1,34 @@
+import org.siouan.frontendgradleplugin.infrastructure.gradle.RunYarn
+
 plugins {
-    id("org.siouan.frontend-jdk8") version "4.0.1"
+    id("org.siouan.frontend-jdk17") version "7.0.0"
 }
 
-apply(plugin = "org.siouan.frontend-jdk8")
-
 frontend {
-    yarnEnabled.set(true) // you might change this to false, when using npm
-    yarnDistributionProvided.set(true) // you might change this to false, when yarn not installed globally
-    nodeDistributionProvided.set(true) // you might change this to false, when node not installed globally
+    nodeDistributionProvided.set(false)
+    nodeVersion.set("18.16.0")
+    nodeDistributionUrlRoot.set("https://nodejs.org/dist/")
+    nodeDistributionUrlPathPattern.set("vVERSION/node-vVERSION-ARCH.TYPE")
+    nodeInstallDirectory.set(project.layout.projectDirectory.dir("node"))
 
     installScript.set("install")
     assembleScript.set("build")
 }
 
-val addPackage = tasks.register<Exec>("addPackage") {
-    outputs.upToDateWhen { false }
-    workingDir = projectDir
-    commandLine("yarn", "remove", "shared-types")
-    commandLine("yarn", "add", "file:../shared/build/libs/shared-types/")
+val removeSharedTypesTask = tasks.register<RunYarn>("removeSharedTypes") {
+    script = "remove shared-types"
 }
 
-tasks {
-    "build" {
-        dependsOn(":shared:build")
-        doLast {
-            copy {
-                from("$projectDir/dist/")
-                into("../server/resources/dist/")
-            }
-        }
+tasks.register<RunYarn>("addSharedTypes") {
+    dependsOn(removeSharedTypesTask)
+    script = "add file:../shared/build/libs/shared-types/"
+}
+
+tasks.get("build").dependsOn(":shared:build")
+
+tasks.get("build").doLast {
+    copy {
+        from("$projectDir/dist/")
+        into("../server/resources/dist/")
     }
 }
